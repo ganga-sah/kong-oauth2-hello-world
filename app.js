@@ -60,6 +60,7 @@ var LISTEN_PORT = process.env["LISTEN_PORT"] || 3000
   a given client_id - used for a nicer fronted experience
 */
 function get_application_name(client_id, callback) {
+  console.log("url="+KONG_ADMIN + "/oauth2/" + client_id)
   request({
     method: "GET",
     url: KONG_ADMIN + "/oauth2/" + client_id
@@ -67,9 +68,15 @@ function get_application_name(client_id, callback) {
     var application_name;
     if (client_id && !error) {
       var json_response = JSON.parse(body);
-      if (json_response.data.length == 1) {
-        application_name = json_response.data[0].name;
-      }
+      console.log("body="+body);
+      console.log("json_response="+JSON.stringify(json_response));
+/*
+{"client_secret":"bDWx43ZcLVNDaH6OUp8Ct4v0BSfe964H","hash_secret":false,"name":"Hello World App","id":"6fdf512e-6e8c-4e28-a9f3-6acc0c7b07c7","redirect_uris":["http://konghq.com/"],"client_id":"Bso9ZDvTcJYb466MVqcYUKvwnCEGGmld","client_type":"confidential","tags":null,"consumer":{"id":"bafd21f8-aa72-4334-94b9-286b82aef949"},"created_at":1657583659}
+*/
+      //if (json_response.data.length == 1) {
+      //  application_name = json_response.data[0].name;
+      //}
+      application_name = json_response.name;
     }
     callback(application_name);
   });
@@ -95,6 +102,8 @@ function authorize(client_id, response_type, scope, callback) {
       authenticated_userid: "userid123" // Hard-coding this value (it should be the logged-in user ID)
     }
   }, function(error, response, body) {
+    console.log("body="+body);
+    console.log("response="+JSON.stringify(response));
     callback(JSON.parse(body).redirect_uri);
   });
 }
